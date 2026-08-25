@@ -1,0 +1,27 @@
+$gray-support: #c9cbcc;
+$gray-mid: #8b9094;
+$brand: #1289dc;
+$brand-hover: #0b509c;
+$navy: #031127;
+
+$font: "Outfit", "Segoe UI", system-ui, sans-serif;
+
+$radius-card: 28px;
+$radius-plate: 22px;
+$radius-btn: 16px;
+
+$ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+$ease-in-out: cubic-bezier(0.45, 0, 0.15, 1);
+
+:root {
+  --gray-support: #{$gray-support};
+  --gray-mid: #{$gray-mid};
+  --brand: #{$brand};
+  --brand-hover: #{$brand-hover};
+  --navy: #{$navy};
+  --white: #f4f7fa;
+  --ring-size: 339.292;
+  --progress: 0;
+  --spot-x: 50%;
+  --spot-y: 38%;
+}

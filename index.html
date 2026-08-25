@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#031127" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="description" content="Atalho oficial da LA Catálogo para o Instagram." />
+
+    <title>LA Catálogo · Instagram</title>
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="LA Catálogo · Instagram" />
+    <meta property="og:description" content="O catálogo oficial, agora no Instagram." />
+    <meta property="og:image" content="assets/logo_LA.png" />
+    <meta name="twitter:card" content="summary" />
+
+    <link rel="icon" href="assets/logo_LA.png" type="image/png" />
+    <link rel="apple-touch-icon" href="assets/logo_LA.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/main.css" />
+  </head>
+  <body>
+    <a class="skip" href="#cta">Ir para o Instagram</a>
+
+    <div class="ambient" aria-hidden="true">
+      <div class="ambient__spot" data-spot></div>
+      <div class="ambient__orb ambient__orb--a"></div>
+      <div class="ambient__orb ambient__orb--b"></div>
+      <div class="ambient__grid"></div>
+      <div class="ambient__noise"></div>
+    </div>
+
+    <main class="stage">
+      <article class="card">
+        <div class="card__glow" aria-hidden="true"></div>
+
+        <div class="motif" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <div class="plate">
+          <svg class="plate__ring" viewBox="0 0 120 120" aria-hidden="true">
+            <defs>
+              <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#7ec8ff" />
+                <stop offset="45%" stop-color="#1289DC" />
+                <stop offset="100%" stop-color="#0B509C" />
+              </linearGradient>
+            </defs>
+            <circle class="plate__track" cx="60" cy="60" r="54"></circle>
+            <circle class="plate__progress" cx="60" cy="60" r="54"></circle>
+          </svg>
+          <div class="plate__disk">
+            <img class="plate__logo" src="assets/logo_LA.png" alt="LA Catálogo" width="78" height="78" />
+          </div>
+        </div>
+
+        <p class="kicker">Perfil oficial</p>
+        <h1 class="headline">LA Catálogo</h1>
+        <p class="lede" data-tagline>O catálogo oficial, agora no Instagram.</p>
+        <button class="handle" type="button" data-copy-handle title="Copiar @">
+          <span data-handle>@lacatalogo</span>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8" />
+            <path d="M7 15H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="1.8" />
+          </svg>
+        </button>
+
+        <a
+          class="cta"
+          id="cta"
+          data-cta
+          href="https://www.instagram.com/lacatalogo/"
+          rel="noopener noreferrer"
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="17.4" cy="6.6" r="1" fill="currentColor" />
+          </svg>
+          Abrir no Instagram
+        </a>
+
+        <p class="status" data-status role="status" aria-live="polite">
+          Redirecionando em <strong data-seconds>5</strong>s — ou pressione Enter
+        </p>
+
+        <div class="actions">
+          <button class="ghost" type="button" data-copy-link>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M10 13a5 5 0 0 0 7.07 0l1.41-1.41a5 5 0 0 0-7.07-7.07L10 5.93" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              <path d="M14 11a5 5 0 0 0-7.07 0L5.52 12.41a5 5 0 1 0 7.07 7.07L14 18.07" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+            Copiar link
+          </button>
+          <button class="ghost" type="button" data-share>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="18" cy="5" r="2.4" stroke="currentColor" stroke-width="1.8" />
+              <circle cx="6" cy="12" r="2.4" stroke="currentColor" stroke-width="1.8" />
+              <circle cx="18" cy="19" r="2.4" stroke="currentColor" stroke-width="1.8" />
+              <path d="M8.2 13.1 15.7 17.4M15.8 6.6 8.3 10.8" stroke="currentColor" stroke-width="1.8" />
+            </svg>
+            Compartilhar
+          </button>
+          <button class="ghost ghost--wide" type="button" data-stay>
+            Ficar nesta página
+          </button>
+        </div>
+
+        <p class="foot">© <span data-year>2026</span> LA Catálogo</p>
+      </article>
+    </main>
+
+    <div class="toast" data-toast hidden role="status"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "la-links",
+  "private": true,
+  "description": "Redirecionador de links da LA Catálogo",
+  "scripts": {
+    "dev": "sass --watch scss/main.scss:css/main.css --style=expanded --source-map",
+    "build": "sass scss/main.scss:css/main.css --style=compressed --no-source-map",
+    "start": "npx --yes serve . -l 5173"
+  },
+  "devDependencies": {
+    "sass": "^1.90.0"
+  }
+}

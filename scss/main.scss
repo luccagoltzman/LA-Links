@@ -1,0 +1,484 @@
+@use "tokens" as *;
+@use "reset";
+@use "animations";
+
+body {
+  overflow: hidden;
+  position: relative;
+}
+
+.skip {
+  position: absolute;
+  left: 16px;
+  top: -48px;
+  z-index: 20;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--brand);
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+
+  &:focus {
+    top: 16px;
+  }
+}
+
+.ambient {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ambient__spot {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(
+      520px 420px at var(--spot-x) var(--spot-y),
+      color-mix(in srgb, var(--brand) 28%, transparent),
+      transparent 58%
+    ),
+    radial-gradient(900px 640px at 50% 110%, color-mix(in srgb, var(--brand-hover) 35%, transparent), transparent 70%),
+    radial-gradient(70% 50% at 50% -10%, color-mix(in srgb, var(--gray-support) 8%, transparent), transparent 60%);
+  transition: background 0.4s linear;
+}
+
+.ambient__orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.55;
+
+  &--a {
+    width: min(42vw, 380px);
+    height: min(42vw, 380px);
+    left: -8%;
+    top: 8%;
+    background: color-mix(in srgb, var(--brand) 42%, transparent);
+    animation: orb-drift-a 14s $ease-in-out infinite;
+  }
+
+  &--b {
+    width: min(50vw, 460px);
+    height: min(50vw, 460px);
+    right: -12%;
+    bottom: -8%;
+    background: color-mix(in srgb, var(--brand-hover) 50%, transparent);
+    animation: orb-drift-b 18s $ease-in-out infinite;
+  }
+}
+
+.ambient__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 22px,
+      color-mix(in srgb, var(--gray-support) 4.5%, transparent) 22px 23px
+    );
+  mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+}
+
+.ambient__noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.stage {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: calc(32px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom));
+}
+
+.card {
+  position: relative;
+  width: min(100%, 420px);
+  padding: 36px 28px 24px;
+  border-radius: $radius-card;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--gray-support) 8%, transparent), transparent 28%),
+    color-mix(in srgb, var(--navy) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gray-support) 16%, transparent);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, white 8%, transparent) inset,
+    0 30px 80px color-mix(in srgb, black 45%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--brand) 8%, transparent);
+  backdrop-filter: blur(22px) saturate(1.2);
+  -webkit-backdrop-filter: blur(22px) saturate(1.2);
+  text-align: center;
+  isolation: isolate;
+  animation: fade-up 0.9s $ease-out both;
+}
+
+.card__glow {
+  position: absolute;
+  inset: auto -20% -40% -20%;
+  height: 55%;
+  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--brand) 22%, transparent), transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+  animation: pulse-glow 6s ease-in-out infinite;
+}
+
+.motif {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  height: 42px;
+  width: 42px;
+  margin: 0 auto 26px;
+  transform: rotate(45deg);
+}
+
+.motif span {
+  display: block;
+  width: 6px;
+  height: 42px;
+  border-radius: 2px;
+  animation: fade-up 0.8s $ease-out both;
+
+  &:nth-child(1),
+  &:nth-child(4) {
+    background: linear-gradient(180deg, #4db3ff, var(--brand) 45%, var(--brand-hover));
+    box-shadow: 0 0 10px color-mix(in srgb, var(--brand) 65%, transparent);
+  }
+
+  &:nth-child(2),
+  &:nth-child(3) {
+    background: linear-gradient(180deg, #eef0f1 0%, $gray-support 28%, #9aa0a3 62%, #6d7276 100%);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, white 18%, transparent);
+  }
+
+  @for $i from 1 through 4 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{0.08s * $i};
+    }
+  }
+}
+
+.plate {
+  position: relative;
+  width: 148px;
+  height: 148px;
+  margin: 0 auto 28px;
+  animation: plate-in 0.9s $ease-out 0.15s both;
+}
+
+.plate__ring {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+
+  circle {
+    fill: none;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+}
+
+.plate__track {
+  stroke: color-mix(in srgb, var(--gray-support) 18%, transparent);
+}
+
+.plate__progress {
+  stroke: url(#ring-grad);
+  stroke-dasharray: var(--ring-size);
+  stroke-dashoffset: calc(var(--ring-size) * (1 - var(--progress)));
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--brand) 80%, transparent));
+  transition: stroke-dashoffset 0.08s linear;
+}
+
+.plate__disk {
+  position: absolute;
+  inset: 14px;
+  display: grid;
+  place-items: center;
+  border-radius: $radius-plate;
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--gray-support) 16%, var(--navy)) 0%, var(--navy) 48%, #01080f 100%);
+  border: 1px solid color-mix(in srgb, var(--gray-support) 28%, transparent);
+  box-shadow:
+    0 18px 40px color-mix(in srgb, black 40%, transparent),
+    inset 0 1px 0 color-mix(in srgb, white 12%, transparent),
+    inset 0 -18px 28px color-mix(in srgb, black 35%, transparent);
+  overflow: hidden;
+}
+
+.plate__disk::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, white 28%, transparent), transparent);
+  animation: shine 4.8s ease-in-out 1.2s infinite;
+}
+
+.plate__logo {
+  width: 78px;
+  height: auto;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 8px 16px color-mix(in srgb, black 45%, transparent));
+}
+
+.kicker {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gray-support);
+  margin-bottom: 8px;
+  animation: fade-up 0.8s $ease-out 0.28s both;
+}
+
+.headline {
+  font-size: clamp(1.85rem, 5vw, 2.15rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  margin-bottom: 8px;
+  animation: fade-up 0.8s $ease-out 0.36s both;
+}
+
+.lede {
+  color: var(--gray-mid);
+  font-size: 0.98rem;
+  max-width: 32ch;
+  margin: 0 auto 10px;
+  animation: fade-up 0.8s $ease-out 0.42s both;
+}
+
+.handle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 auto 26px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: var(--brand);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  animation: fade-up 0.8s $ease-out 0.48s both;
+  transition: color 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    color: #7ec8ff;
+    background: color-mix(in srgb, var(--brand) 10%, transparent);
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+    opacity: 0.8;
+  }
+}
+
+.cta {
+  --mx: 50%;
+  --my: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  padding: 0 20px;
+  border-radius: $radius-btn;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.02rem;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  background: linear-gradient(180deg, color-mix(in srgb, white 16%, var(--brand)), var(--brand) 38%, var(--brand-hover));
+  box-shadow:
+    0 1px 0 color-mix(in srgb, white 28%, transparent) inset,
+    0 12px 28px color-mix(in srgb, var(--brand) 32%, transparent);
+  overflow: hidden;
+  isolation: isolate;
+  animation: fade-up 0.8s $ease-out 0.56s both;
+  transition:
+    background 0.22s ease,
+    transform 0.22s $ease-out,
+    box-shadow 0.22s ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(140px 80px at var(--mx) var(--my), color-mix(in srgb, white 28%, transparent), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    z-index: -1;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: linear-gradient(180deg, color-mix(in srgb, white 10%, var(--brand-hover)), var(--brand-hover));
+    box-shadow: 0 16px 32px color-mix(in srgb, var(--brand-hover) 38%, transparent);
+
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  &:active {
+    transform: translateY(1px) scale(0.985);
+  }
+}
+
+.status {
+  min-height: 1.4em;
+  margin: 14px 0 18px;
+  color: var(--gray-mid);
+  font-size: 0.84rem;
+  font-variant-numeric: tabular-nums;
+  animation: fade-up 0.8s $ease-out 0.64s both;
+
+  strong {
+    color: var(--gray-support);
+    font-weight: 600;
+  }
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  animation: fade-up 0.8s $ease-out 0.7s both;
+}
+
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--gray-support) 16%, transparent);
+  color: var(--gray-support);
+  font-size: 0.82rem;
+  font-weight: 500;
+  background: color-mix(in srgb, var(--gray-support) 4%, transparent);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+
+  svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  &:hover {
+    color: var(--white);
+    border-color: color-mix(in srgb, var(--brand) 45%, transparent);
+    background: color-mix(in srgb, var(--brand) 12%, transparent);
+  }
+
+  &--wide {
+    grid-column: 1 / -1;
+    margin-top: 2px;
+  }
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.foot {
+  margin-top: 22px;
+  color: color-mix(in srgb, var(--gray-mid) 80%, transparent);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  animation: fade-up 0.8s $ease-out 0.78s both;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  z-index: 10;
+  transform: translateX(-50%);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--navy);
+  border: 1px solid color-mix(in srgb, var(--brand) 40%, transparent);
+  color: var(--white);
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 12px 40px color-mix(in srgb, black 40%, transparent);
+  animation: toast-in 0.35s $ease-out both;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+body.is-leaving {
+  .card {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+    transition: opacity 0.45s ease, transform 0.45s $ease-out;
+  }
+
+  .ambient {
+    opacity: 0.35;
+    transition: opacity 0.45s ease;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .plate {
+    animation:
+      plate-in 0.9s $ease-out 0.15s both,
+      float 7s ease-in-out 1.2s infinite;
+  }
+}
+
+@media (max-width: 420px) {
+  .card {
+    padding: 30px 20px 20px;
+    border-radius: 24px;
+  }
+
+  .plate {
+    width: 132px;
+    height: 132px;
+  }
+
+  .plate__logo {
+    width: 68px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .plate__disk::after {
+    display: none;
+  }
+}
