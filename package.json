@@ -1,7 +1,7 @@
 {
   "name": "la-links",
   "private": true,
-  "description": "Redirecionador de links da LA Catálogo",
+  "description": "Hub de links da LA Veículos",
   "scripts": {
     "dev": "sass --watch scss/main.scss:css/main.css --style=expanded --source-map",
     "build": "sass scss/main.scss:css/main.css --style=compressed --no-source-map",

@@ -1,54 +1,49 @@
 (() => {
   const cfg = window.LA_LINKS || {};
-  const username = String(cfg.instagramUsername || "lacatalogo").replace(/^@/, "");
-  const delay = Number(cfg.redirectDelayMs) || 5200;
-  const webUrl = `https://www.instagram.com/${encodeURIComponent(username)}/`;
-  const appUrl = `instagram://user?username=${encodeURIComponent(username)}`;
-  const brand = cfg.brand || "LA Catálogo";
-
-  const params = new URLSearchParams(location.search);
-  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const alreadyVisited = sessionStorage.getItem("la-links-held") === "1";
-  const forceNow = params.has("now");
-  const forceStay = params.has("stay") || alreadyVisited;
+  const brand = cfg.brand || "LA Veículos";
+  const store = cfg.store || {};
+  const catalog = cfg.catalog || {};
+  const wa = cfg.whatsapp || {};
+  const socials = Array.isArray(cfg.socials) ? cfg.socials : [];
 
   const els = {
-    cta: document.querySelector("[data-cta]"),
-    handle: document.querySelector("[data-handle]"),
+    brand: document.querySelector("[data-brand]"),
+    brandFoot: document.querySelector("[data-brand-foot]"),
     tagline: document.querySelector("[data-tagline]"),
-    status: document.querySelector("[data-status]"),
-    seconds: document.querySelector("[data-seconds]"),
-    stay: document.querySelector("[data-stay]"),
-    copyHandle: document.querySelector("[data-copy-handle]"),
-    copyLink: document.querySelector("[data-copy-link]"),
+    catalog: document.querySelector("[data-catalog]"),
+    catalogLabel: document.querySelector("[data-catalog-label]"),
+    catalogHint: document.querySelector("[data-catalog-hint]"),
+    whatsapp: document.querySelector("[data-whatsapp]"),
+    whatsappLabel: document.querySelector("[data-whatsapp-label]"),
+    placeLine: document.querySelector("[data-place-line]"),
+    placeHours: document.querySelector("[data-place-hours]"),
+    maps: document.querySelector("[data-maps]"),
+    copyAddress: document.querySelector("[data-copy-address]"),
+    phone: document.querySelector("[data-phone]"),
     share: document.querySelector("[data-share]"),
+    socialWrap: document.querySelector("[data-social-wrap]"),
+    socials: document.querySelector("[data-socials]"),
     toast: document.querySelector("[data-toast]"),
     year: document.querySelector("[data-year]"),
-    spot: document.querySelector("[data-spot]"),
   };
 
-  let raf = 0;
-  let startedAt = 0;
-  let pausedAt = 0;
-  let elapsed = 0;
-  let leaving = false;
-  let held = forceStay && !forceNow;
+  const ICONS = {
+    instagram: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/><circle cx="17.4" cy="6.6" r="1" fill="currentColor"/></svg>`,
+    facebook: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 8.5h2.5V5.8H14c-2.3 0-3.8 1.6-3.8 4v1.7H8v2.7h2.2V20h2.8v-5.8h2.4l.5-2.7h-2.9V9.8c0-.8.3-1.3 1-1.3Z" fill="currentColor"/></svg>`,
+    tiktok: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 6.2c.8 1.8 2.3 3.1 4.3 3.4v2.6c-1.5 0-2.9-.5-4.1-1.3v5.6A5.5 5.5 0 1 1 10.6 11v2.7a2.8 2.8 0 1 0 2 2.7V4h1.4v2.2Z" fill="currentColor"/></svg>`,
+    youtube: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="3.5" stroke="currentColor" stroke-width="1.8"/><path d="M10.5 9.8v4.4L15 12l-4.5-2.2Z" fill="currentColor"/></svg>`,
+  };
 
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-  els.cta.href = webUrl;
-  els.handle.textContent = `@${username}`;
-  if (cfg.tagline) els.tagline.textContent = cfg.tagline;
-  els.year.textContent = String(new Date().getFullYear());
-
-  if (!navigator.share) els.share.hidden = true;
-
-  function setProgress(value) {
-    document.documentElement.style.setProperty("--progress", String(value));
+  function digits(value) {
+    return String(value || "").replace(/\D/g, "");
   }
 
-  function setStatus(html) {
-    els.status.innerHTML = html;
+  function formatPhone(value) {
+    const n = digits(value);
+    const local = n.startsWith("55") ? n.slice(2) : n;
+    if (local.length === 11) return `(${local.slice(0, 2)}) ${local.slice(2, 7)}-${local.slice(7)}`;
+    if (local.length === 10) return `(${local.slice(0, 2)}) ${local.slice(2, 6)}-${local.slice(6)}`;
+    return local;
   }
 
   function toast(message) {
@@ -78,135 +73,119 @@
     }
   }
 
-  function openInstagram() {
-    if (leaving) return;
-    leaving = true;
-    document.body.classList.add("is-leaving");
-    sessionStorage.setItem("la-links-held", "1");
-
-    const goWeb = () => {
-      location.href = webUrl;
-    };
-
-    if (isMobile) {
-      const fallback = window.setTimeout(goWeb, 900);
-      window.addEventListener("pagehide", () => window.clearTimeout(fallback), { once: true });
-      location.href = appUrl;
-      return;
-    }
-
-    window.setTimeout(goWeb, prefersReduced ? 0 : 280);
+  function whatsappUrl(message) {
+    const number = digits(wa.number);
+    if (!number) return "";
+    const text = encodeURIComponent(message || wa.message || `Olá! Vi o perfil da ${brand}.`);
+    return `https://wa.me/${number}?text=${text}`;
   }
 
-  function hold() {
-    held = true;
-    sessionStorage.setItem("la-links-held", "1");
-    cancelAnimationFrame(raf);
-    setProgress(0);
-    els.stay.hidden = true;
-    setStatus("Quando quiser, é só abrir.");
+  function placeText() {
+    const street = String(store.address || "").trim();
+    const city = [store.city, store.state].filter(Boolean).join(" — ");
+    if (street && city) return `${street} · ${city}`;
+    return street || city || store.name || brand;
   }
 
-  function tick(now) {
-    if (held || leaving) return;
-    if (!startedAt) startedAt = now;
-    if (pausedAt) {
-      startedAt += now - pausedAt;
-      pausedAt = 0;
-    }
-
-    elapsed = now - startedAt;
-    const progress = Math.min(elapsed / delay, 1);
-    const remaining = Math.max(0, Math.ceil((delay - elapsed) / 1000));
-
-    setProgress(progress);
-    if (els.seconds) els.seconds.textContent = String(remaining);
-
-    if (progress >= 1) {
-      openInstagram();
-      return;
-    }
-
-    raf = requestAnimationFrame(tick);
+  function mapsUrl() {
+    if (store.mapsUrl) return store.mapsUrl;
+    const query = [store.name || brand, store.address, store.city, store.state].filter(Boolean).join(", ");
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
   }
 
-  function startCountdown() {
-    if (held || prefersReduced || forceStay) {
-      hold();
-      if (prefersReduced) setStatus("Animação reduzida — toque no botão para abrir.");
-      return;
-    }
-
-    setProgress(0);
-    startedAt = 0;
-    raf = requestAnimationFrame(tick);
+  function bindShine(el) {
+    if (!el) return;
+    el.addEventListener("pointermove", (event) => {
+      const rect = el.getBoundingClientRect();
+      el.style.setProperty("--mx", `${((event.clientX - rect.left) / rect.width) * 100}%`);
+      el.style.setProperty("--my", `${((event.clientY - rect.top) / rect.height) * 100}%`);
+    });
   }
 
-  document.addEventListener("visibilitychange", () => {
-    if (held || leaving) return;
-    if (document.hidden) {
-      pausedAt = performance.now();
-      cancelAnimationFrame(raf);
-    } else {
-      raf = requestAnimationFrame(tick);
-    }
-  });
+  els.brand.textContent = brand;
+  els.brandFoot.textContent = brand;
+  document.title = brand;
+  if (cfg.tagline) els.tagline.textContent = cfg.tagline;
+  els.year.textContent = String(new Date().getFullYear());
 
-  els.cta.addEventListener("click", (event) => {
-    event.preventDefault();
-    openInstagram();
-  });
+  if (catalog.label) els.catalogLabel.textContent = catalog.label;
+  if (catalog.hint) els.catalogHint.textContent = catalog.hint;
 
-  els.cta.addEventListener("pointermove", (event) => {
-    const rect = els.cta.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * 100;
-    const y = ((event.clientY - rect.top) / rect.height) * 100;
-    els.cta.style.setProperty("--mx", `${x}%`);
-    els.cta.style.setProperty("--my", `${y}%`);
-  });
-
-  els.stay.addEventListener("click", hold);
-
-  els.copyHandle.addEventListener("click", () => copy(`@${username}`, "Usuário copiado"));
-  els.copyLink.addEventListener("click", () => copy(webUrl, "Link copiado"));
-
-  els.share.addEventListener("click", async () => {
-    try {
-      await navigator.share({
-        title: `${brand} no Instagram`,
-        text: cfg.tagline || `Siga ${brand} no Instagram`,
-        url: webUrl,
-      });
-    } catch (error) {
-      if (error && error.name !== "AbortError") copy(webUrl, "Link copiado");
-    }
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" && !event.metaKey && !event.ctrlKey && !event.altKey) {
-      const tag = document.activeElement && document.activeElement.tagName;
-      if (tag === "BUTTON" || tag === "A" || tag === "INPUT") return;
-      event.preventDefault();
-      openInstagram();
-    }
-    if (event.key === "Escape") hold();
-  });
-
-  window.addEventListener(
-    "pointermove",
-    (event) => {
-      const x = (event.clientX / window.innerWidth) * 100;
-      const y = (event.clientY / window.innerHeight) * 100;
-      document.documentElement.style.setProperty("--spot-x", `${x}%`);
-      document.documentElement.style.setProperty("--spot-y", `${y}%`);
-    },
-    { passive: true }
-  );
-
-  if (forceNow) {
-    openInstagram();
-    return;
+  const catalogUrl = String(catalog.url || "").trim();
+  const waFallback = whatsappUrl(`Olá! Quero ver o catálogo digital da ${brand}.`);
+  els.catalog.href = catalogUrl || waFallback || "#";
+  if (catalogUrl) {
+    els.catalog.target = "_blank";
+  } else if (waFallback) {
+    els.catalog.target = "_blank";
+    els.catalogHint.textContent = "Peça o estoque pelo WhatsApp";
   }
 
-  startCountdown();
+  const waHref = whatsappUrl();
+  if (waHref) {
+    els.whatsapp.href = waHref;
+    els.whatsappLabel.textContent = formatPhone(wa.number) || "Fale com a loja agora";
+  } else {
+    els.whatsapp.hidden = true;
+  }
+
+  els.placeLine.textContent = placeText();
+  els.maps.href = mapsUrl();
+  if (store.hours) {
+    els.placeHours.hidden = false;
+    els.placeHours.textContent = store.hours;
+  }
+
+  const phoneDigits = digits(cfg.phone || wa.number);
+  if (phoneDigits) {
+    els.phone.href = `tel:+${phoneDigits}`;
+  } else {
+    els.phone.hidden = true;
+  }
+
+  const visibleSocials = socials.filter((item) => item && item.url && item.label);
+  if (visibleSocials.length) {
+    els.socialWrap.hidden = false;
+    els.socials.innerHTML = visibleSocials
+      .map(
+        (item) => `
+        <a class="social__btn" href="${item.url}" target="_blank" rel="noopener noreferrer" aria-label="${item.label}">
+          ${ICONS[item.id] || ICONS.instagram}
+          <span>${item.label}</span>
+        </a>`
+      )
+      .join("");
+  }
+
+  if (!navigator.share) {
+    els.share.addEventListener("click", () => copy(location.href, "Link copiado"));
+  } else {
+    els.share.addEventListener("click", async () => {
+      try {
+        await navigator.share({
+          title: brand,
+          text: cfg.tagline || brand,
+          url: location.href,
+        });
+      } catch (error) {
+        if (error && error.name !== "AbortError") copy(location.href, "Link copiado");
+      }
+    });
+  }
+
+  els.copyAddress.addEventListener("click", () => copy(placeText(), "Endereço copiado"));
+
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+  if (finePointer.matches) {
+    bindShine(els.catalog);
+    bindShine(els.whatsapp);
+    window.addEventListener(
+      "pointermove",
+      (event) => {
+        document.documentElement.style.setProperty("--spot-x", `${(event.clientX / window.innerWidth) * 100}%`);
+        document.documentElement.style.setProperty("--spot-y", `${(event.clientY / window.innerHeight) * 100}%`);
+      },
+      { passive: true }
+    );
+  }
 })();
